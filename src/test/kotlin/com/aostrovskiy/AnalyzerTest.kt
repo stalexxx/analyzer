@@ -60,8 +60,3 @@ class AnalyzerTest {
 }
 
 fun URL.toPath(): Path = Paths.get(this.toURI())
-
-// Suppose that 0.000001 on any fiat currency is nothing
-infix fun Double.`~==`(another: Double): Boolean {
-    return abs(this - another) < 0.000001
-}
