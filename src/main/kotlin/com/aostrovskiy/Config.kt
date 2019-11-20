@@ -1,9 +1,6 @@
 package com.aostrovskiy
 
-import java.time.Instant
+import java.nio.file.Path
+import java.time.LocalDateTime
 
-data class Config(val cvsFile: String, val from: Instant, val to: Instant)
-
-fun parseConfig(args: Array<String>): Config {
-    return Config("", Instant.MAX, Instant.MAX)
-}
+data class Config(val cvsFile: Path, val from: LocalDateTime, val to: LocalDateTime, val merchant: String)
