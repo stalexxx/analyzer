@@ -13,32 +13,48 @@ class AnalyzerTest {
     @Test
     fun `test empty`() {
         val cvsFile = this.javaClass.classLoader.getResource("test_empty.csv")!!.toPath()
-        val analyzer = Analyzer(Config(cvsFile, LocalDateTime.MIN, LocalDateTime.MAX, ""))
-        val (txNumber, txAverage) = analyzer.analyze()
+        val analyzer = Analyzer(cvsFile, LocalDateTime.MIN, LocalDateTime.MAX, "")
+        val result = analyzer.analyze()
 
-        assertEquals(txNumber, 0)
-        assertEquals(txAverage, 0.0)
+        assert(result is AnalyzeResult.Ok)
+        result as AnalyzeResult.Ok
+        assertEquals(result.txNumber, 0)
+        assertEquals(result.txAverage, 0.0)
     }
 
     @Test
     fun `test simple`() {
         val cvsFile = this.javaClass.classLoader.getResource("test0.csv")!!.toPath()
-        val analyzer = Analyzer(Config(cvsFile, LocalDateTime.MIN, LocalDateTime.MAX, ""))
-        val (txNumber, txAverage) = analyzer.analyze()
+        val analyzer = Analyzer(cvsFile, LocalDateTime.MIN, LocalDateTime.MAX, "")
+        val result = analyzer.analyze()
 
-        assertEquals(txNumber, 0)
-        assertEquals(txAverage, 0.0)
+        assert(result is AnalyzeResult.Ok)
+        result as AnalyzeResult.Ok
+        assertEquals(result.txNumber, 0)
+        assertEquals(result.txAverage, 0.0)
+    }
+
+    @Test
+    fun `test wrong csv`() {
+        val cvsFile = this.javaClass.classLoader.getResource("test_wrong.csv")!!.toPath()
+        val analyzer = Analyzer(cvsFile, LocalDateTime.MIN, LocalDateTime.MAX, "")
+        val result = analyzer.analyze()
+
+        assert(result is AnalyzeResult.CsvParseErr)
     }
 
     @Test
     fun `test Jason's test case`() {
         val cvsFile = this.javaClass.classLoader.getResource("test1.csv")!!.toPath()
-        val analyzer = Analyzer(Config(cvsFile, "20/08/2018 12:00:00".toDate()!!,
-        "20/08/2018 13:00:00".toDate()!!, "Kwik-E-Mart"))
-        val (txNumber, txAverage) = analyzer.analyze()
+        val analyzer = Analyzer(cvsFile, "20/08/2018 12:00:00".toDate()!!,
+        "20/08/2018 13:00:00".toDate()!!, "Kwik-E-Mart")
 
-        assertEquals( 1, txNumber)
-        assert( txAverage `~==` 59.99);
+        val result = analyzer.analyze()
+
+        assert(result is AnalyzeResult.Ok)
+        result as AnalyzeResult.Ok
+        assertEquals( 1, result.txNumber)
+        assert( result.txAverage `~==` 59.99);
     }
 }
 

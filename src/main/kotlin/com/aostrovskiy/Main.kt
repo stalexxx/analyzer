@@ -11,8 +11,8 @@ fun main(args: Array<String>) {
 }
 
 class AnalyzerTool: CliktCommand() {
-    private val csv: Path? by option("path", "file", "csv", help = "CSV location").path()
-    private val from: String? by option(help = "From date");
+    private val csv: Path? by option(help = "CSV location").path()
+    private val from: String? by option(help = "From date")
     private val to: String? by option(help = "To date")
     private val merchant: String? by option(help = "Merchant")
 
@@ -22,17 +22,19 @@ class AnalyzerTool: CliktCommand() {
         val to = to?.toDate() ?: exit("To date not set or incorrect")
         val merchant = merchant ?: exit("Merchant not set or incorrect")
 
-        val analyzer = Analyzer(Config(path, from, to, merchant))
-        val (txNumber, txAverage) = analyzer.analyze()
-
-        println("Number of transactions = $txNumber")
-        println("Average Transaction Value = ${txAverage.withPrecision(2)}")
-
+        val analyzer = Analyzer(path, from, to, merchant)
+        when (val result = analyzer.analyze()) {
+            is AnalyzeResult.Ok -> {
+                println("Number of transactions = ${result.txNumber}")
+                println("Average Transaction Value = ${result.txAverage.withPrecision(2)}")
+            }
+            is AnalyzeResult.CsvParseErr -> println("Incorrect CSV file: ${result.ex.message}")
+        }
     }
 
-    fun Double.withPrecision(decimals: Int = 2) = "%.${decimals}f".format(this)
+    private fun Double.withPrecision(decimals: Int = 2) = "%.${decimals}f".format(this)
 
-    fun exit(msg: String): Nothing {
+    private fun exit(msg: String): Nothing {
         println(msg)
         exitProcess(-1)
     }
