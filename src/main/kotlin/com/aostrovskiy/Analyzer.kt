@@ -27,7 +27,8 @@ class Analyzer(
     }
 
     // Current csv library can't handle 2 symbol separator (have type of char), so
-    // unfortunately trim and " Amount" used
+    // unfortunately trim and " Amount" used. Sorry for that, did't have time to use another lib
+
     private inline val CsvRow.id
         get() = this.getField("ID").trim()
 
