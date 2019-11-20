@@ -7,14 +7,12 @@ import java.net.URL
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDateTime
-import kotlin.math.abs
 import kotlin.test.assertEquals
 
 class AnalyzerTest {
     @Test
     fun `test empty`() {
-        val cvsFile = this.javaClass.classLoader.getResource("test_empty.csv")!!.toPath()
-        val analyzer = Analyzer(cvsFile, LocalDateTime.MIN, LocalDateTime.MAX, "")
+        val analyzer = Analyzer("test_empty.csv".toPathFromResource(), LocalDateTime.MIN, LocalDateTime.MAX, "")
         val result = analyzer.analyze()
 
         assert(result is AnalyzeResult.Ok)
@@ -25,8 +23,7 @@ class AnalyzerTest {
 
     @Test
     fun `test simple`() {
-        val cvsFile = this.javaClass.classLoader.getResource("test0.csv")!!.toPath()
-        val analyzer = Analyzer(cvsFile, LocalDateTime.MIN, LocalDateTime.MAX, "")
+        val analyzer = Analyzer("test0.csv".toPathFromResource(), LocalDateTime.MIN, LocalDateTime.MAX, "")
         val result = analyzer.analyze()
 
         assert(result is AnalyzeResult.Ok)
@@ -37,8 +34,7 @@ class AnalyzerTest {
 
     @Test
     fun `test wrong csv`() {
-        val cvsFile = this.javaClass.classLoader.getResource("test_wrong.csv")!!.toPath()
-        val analyzer = Analyzer(cvsFile, LocalDateTime.MIN, LocalDateTime.MAX, "")
+        val analyzer = Analyzer("test_wrong_csv.csv".toPathFromResource(), LocalDateTime.MIN, LocalDateTime.MAX, "")
         val result = analyzer.analyze()
 
         assert(result is AnalyzeResult.CsvParseErr)
@@ -46,17 +42,21 @@ class AnalyzerTest {
 
     @Test
     fun `test Jason's test case`() {
-        val cvsFile = this.javaClass.classLoader.getResource("test1.csv")!!.toPath()
-        val analyzer = Analyzer(cvsFile, "20/08/2018 12:00:00".toDate()!!,
-        "20/08/2018 13:00:00".toDate()!!, "Kwik-E-Mart")
+        val analyzer = Analyzer(
+            "test1.csv".toPathFromResource(), "20/08/2018 12:00:00".toDateOrNull()!!,
+            "20/08/2018 13:00:00".toDateOrNull()!!, "Kwik-E-Mart"
+        )
 
         val result = analyzer.analyze()
 
         assert(result is AnalyzeResult.Ok)
         result as AnalyzeResult.Ok
         assertEquals(1, result.txNumber)
-        assertEquals(result.txAverage,  BigDecimal(BigInteger.valueOf(5999), 2))
+        assertEquals(result.txAverage, BigDecimal(BigInteger.valueOf(5999), 2))
     }
+
+    private fun String.toPathFromResource() = this@AnalyzerTest.javaClass.classLoader.getResource(this)!!.toPath()
 }
+
 
 fun URL.toPath(): Path = Paths.get(this.toURI())

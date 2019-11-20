@@ -34,7 +34,7 @@ class Analyzer(
         get() = this.getField("ID").trim()
 
     private inline val CsvRow.dateTime: LocalDateTime?
-        get() = dateTimeStr.toDate()
+        get() = dateTimeStr.toDateOrNull()
 
     private inline val CsvRow.dateTimeStr: String
         get() = this.getField(" Date").trim()
@@ -104,6 +104,6 @@ class Analyzer(
                 }
             }
 
-        return AnalyzeResult.Ok(count, sum.div(BigDecimal(count)))
+        return AnalyzeResult.Ok(count, sum / BigDecimal(count))
     }
 }
