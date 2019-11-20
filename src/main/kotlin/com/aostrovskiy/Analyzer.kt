@@ -39,7 +39,7 @@ class Analyzer(
 
     private inline val CsvRow.amountStr
         get() = this.getField(" Amount").trim()
-    
+
     private inline val CsvRow.amount: Double?
         get() = try {
             amountStr.toDouble()

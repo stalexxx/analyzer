@@ -4,7 +4,6 @@ import org.junit.Test
 import java.net.URL
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.time.Instant
 import java.time.LocalDateTime
 import kotlin.math.abs
 import kotlin.test.assertEquals
@@ -53,8 +52,8 @@ class AnalyzerTest {
 
         assert(result is AnalyzeResult.Ok)
         result as AnalyzeResult.Ok
-        assertEquals( 1, result.txNumber)
-        assert( result.txAverage `~==` 59.99);
+        assertEquals(1, result.txNumber)
+        assert(result.txAverage `~==` 59.99)
     }
 }
 

@@ -10,14 +10,14 @@ fun main(args: Array<String>) {
     AnalyzerTool().main(args)
 }
 
-class AnalyzerTool: CliktCommand() {
+class AnalyzerTool : CliktCommand() {
     private val csv: Path? by option(help = "CSV location").path()
     private val from: String? by option(help = "From date")
     private val to: String? by option(help = "To date")
     private val merchant: String? by option(help = "Merchant")
 
     override fun run() {
-        val path  = csv?.toAbsolutePath() ?: exit("File not set or incorrect")
+        val path = csv?.toAbsolutePath() ?: exit("File not set or incorrect")
         val from = from?.toDate() ?: exit("From date not set or incorrect")
         val to = to?.toDate() ?: exit("To date not set or incorrect")
         val merchant = merchant ?: exit("Merchant not set or incorrect")
