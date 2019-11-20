@@ -1,6 +1,8 @@
 package com.aostrovskiy
 
 import org.junit.Test
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.net.URL
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -18,7 +20,7 @@ class AnalyzerTest {
         assert(result is AnalyzeResult.Ok)
         result as AnalyzeResult.Ok
         assertEquals(result.txNumber, 0)
-        assertEquals(result.txAverage, 0.0)
+        assertEquals(result.txAverage, BigDecimal.ZERO)
     }
 
     @Test
@@ -30,7 +32,7 @@ class AnalyzerTest {
         assert(result is AnalyzeResult.Ok)
         result as AnalyzeResult.Ok
         assertEquals(result.txNumber, 0)
-        assertEquals(result.txAverage, 0.0)
+        assertEquals(result.txAverage, BigDecimal.ZERO)
     }
 
     @Test
@@ -53,7 +55,7 @@ class AnalyzerTest {
         assert(result is AnalyzeResult.Ok)
         result as AnalyzeResult.Ok
         assertEquals(1, result.txNumber)
-        assert(result.txAverage `~==` 59.99)
+        assertEquals(result.txAverage,  BigDecimal(BigInteger.valueOf(5999), 2))
     }
 }
 

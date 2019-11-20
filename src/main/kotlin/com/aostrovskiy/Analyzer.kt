@@ -4,12 +4,13 @@ import de.siegmar.fastcsv.reader.CsvReader
 import de.siegmar.fastcsv.reader.CsvRow
 import java.io.IOException
 import java.lang.Exception
+import java.math.BigDecimal
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.time.LocalDateTime
 
 sealed class AnalyzeResult {
-    class Ok(val txNumber: Long, val txAverage: Double) : AnalyzeResult()
+    class Ok(val txNumber: Long, val txAverage: BigDecimal) : AnalyzeResult()
     class CsvParseErr(val ex: Exception) : AnalyzeResult()
     class DateFormatErr(val date: String) : AnalyzeResult()
     class DoubleFormatErr(val double: String) : AnalyzeResult()
@@ -41,12 +42,8 @@ class Analyzer(
     private inline val CsvRow.amountStr
         get() = this.getField(" Amount").trim()
 
-    private inline val CsvRow.amount: Double?
-        get() = try {
-            amountStr.toDouble()
-        } catch (e: Exception) {
-            null
-        }
+    private inline val CsvRow.amount: BigDecimal?
+        get() = amountStr.toBigDecimalOrNull()
 
     private inline val CsvRow.merchant
         get() = this.getField(" Merchant").trim()
@@ -73,7 +70,7 @@ class Analyzer(
             csvReader.setContainsHeader(true)
             csvReader.setErrorOnDifferentFieldCount(true)
 
-            val csv = csvReader.read(file, StandardCharsets.UTF_8) ?: return AnalyzeResult.Ok(0, 0.0)
+            val csv = csvReader.read(file, StandardCharsets.UTF_8) ?: return AnalyzeResult.Ok(0, BigDecimal.ZERO)
             doAnalyze(csv.rows)
         } catch (ex: IOException) {
             AnalyzeResult.CsvParseErr(ex)
@@ -84,7 +81,7 @@ class Analyzer(
         val txIdsInRange: HashSet<String> = hashSetOf()
 
         var count = 0L
-        var sum = 0.0
+        var sum = BigDecimal.ZERO
 
         rows
             .filter { it.merchant == this.merchant }
@@ -107,6 +104,6 @@ class Analyzer(
                 }
             }
 
-        return AnalyzeResult.Ok(count, sum / count)
+        return AnalyzeResult.Ok(count, sum.div(BigDecimal(count)))
     }
 }

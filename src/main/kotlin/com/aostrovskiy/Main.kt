@@ -26,7 +26,7 @@ class AnalyzerTool : CliktCommand() {
         when (val result = analyzer.analyze()) {
             is AnalyzeResult.Ok -> {
                 println("Number of transactions = ${result.txNumber}")
-                println("Average Transaction Value = ${result.txAverage.withPrecision(2)}")
+                println("Average Transaction Value = ${result.txAverage}")
             }
             is AnalyzeResult.CsvParseErr -> println("Incorrect CSV file: ${result.ex.message}")
             is AnalyzeResult.DateFormatErr -> println("Date format err: ${result.date}")
