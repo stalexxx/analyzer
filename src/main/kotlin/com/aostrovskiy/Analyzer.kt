@@ -11,6 +11,8 @@ import java.time.LocalDateTime
 sealed class AnalyzeResult {
     class Ok(val txNumber: Long, val txAverage: Double) : AnalyzeResult()
     class CsvParseErr(val ex: Exception) : AnalyzeResult()
+    class DateFormatErr(val date: String) : AnalyzeResult()
+    class DoubleFormatErr(val double: String) : AnalyzeResult()
 }
 
 class Analyzer(
@@ -26,21 +28,29 @@ class Analyzer(
 
     // Current csv library can't handle 2 symbol separator (have type of char), so
     // unfortunately trim and " Amount" used
-    private val CsvRow.id
+    private inline val CsvRow.id
         get() = this.getField("ID").trim()
 
-    private val CsvRow.dateTime: LocalDateTime
-        get() {
-            val dateStr = this.getField(" Date").trim()
-            return LocalDateTime.parse(dateStr, dateTimeFormatter)
-        }
-    private val CsvRow.amount
-        get() = this.getField(" Amount").trim().toDouble()
+    private inline val CsvRow.dateTime: LocalDateTime?
+        get() = dateTimeStr.toDate()
 
-    private val CsvRow.merchant
+    private inline val CsvRow.dateTimeStr: String
+        get() = this.getField(" Date").trim()
+
+    private inline val CsvRow.amountStr
+        get() = this.getField(" Amount").trim()
+    
+    private inline val CsvRow.amount: Double?
+        get() = try {
+            amountStr.toDouble()
+        } catch (e: Exception) {
+            null
+        }
+
+    private inline val CsvRow.merchant
         get() = this.getField(" Merchant").trim()
 
-    private val CsvRow.type: Type
+    private inline val CsvRow.type: Type
         get() {
             val type = this.getField(" Type").trim()
             return Type.valueOf(type)
@@ -79,19 +89,19 @@ class Analyzer(
             .filter { it.merchant == this.merchant }
             .forEach { row ->
 
-                val dateTime = row.dateTime;
+                val dateTime = row.dateTime ?: return AnalyzeResult.DateFormatErr(row.dateTimeStr);
                 val type = row.type
-                val amount = row.amount
+                val amount = row.amount ?: return AnalyzeResult.DoubleFormatErr(row.amountStr);
                 val id = row.id
 
                 if (type == Type.PAYMENT && dateTime >= from && dateTime <= to) {
                     count += 1;
-                    sum += amount;
+                    sum += amount
                     txIds += id
                 } else if (type == Type.REVERSAL) {
                     if (row.related in txIds) {
                         count -= 1;
-                        sum -= row.amount
+                        sum -= amount
                     }
                 }
             }
