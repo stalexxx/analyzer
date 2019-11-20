@@ -59,8 +59,6 @@ class Analyzer(
     private val CsvRow.related: String
         get() = this.getField(" Related Transaction").trim()
 
-    private val txIds: HashSet<String> = hashSetOf()
-
     /**
      * This is function that making analysis. We suppose that file is not huge, and can easyly be read
      * into memory.
@@ -82,6 +80,8 @@ class Analyzer(
     }
 
     private fun doAnalyze(rows: List<CsvRow>): AnalyzeResult {
+        val txIdsInRange: HashSet<String> = hashSetOf()
+
         var count = 0L;
         var sum = 0.0;
 
@@ -97,9 +97,9 @@ class Analyzer(
                 if (type == Type.PAYMENT && dateTime >= from && dateTime <= to) {
                     count += 1;
                     sum += amount
-                    txIds += id
+                    txIdsInRange += id
                 } else if (type == Type.REVERSAL) {
-                    if (row.related in txIds) {
+                    if (row.related in txIdsInRange) {
                         count -= 1;
                         sum -= amount
                     }
