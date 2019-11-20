@@ -39,7 +39,7 @@ class AnalyzerTest {
     }
 
     @Test
-    fun `test Jason's test case`() {
+    fun `test initial test case`() {
         val analyzer = Analyzer(
             "test1.csv".toPathFromResource(), "20/08/2018 12:00:00".toDateOrNull()!!,
             "20/08/2018 13:00:00".toDateOrNull()!!, "Kwik-E-Mart"
