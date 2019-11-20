@@ -3,8 +3,6 @@ package com.aostrovskiy
 import org.junit.Test
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.net.URL
-import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
@@ -55,8 +53,6 @@ class AnalyzerTest {
         assertEquals(result.txAverage, BigDecimal(BigInteger.valueOf(5999), 2))
     }
 
-    private fun String.toPathFromResource() = this@AnalyzerTest.javaClass.classLoader.getResource(this)!!.toPath()
+    private fun String.toPathFromResource() =
+        Paths.get(this@AnalyzerTest.javaClass.classLoader.getResource(this)!!.toURI())
 }
-
-
-fun URL.toPath(): Path = Paths.get(this.toURI())
