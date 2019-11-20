@@ -82,25 +82,25 @@ class Analyzer(
     private fun doAnalyze(rows: List<CsvRow>): AnalyzeResult {
         val txIdsInRange: HashSet<String> = hashSetOf()
 
-        var count = 0L;
-        var sum = 0.0;
+        var count = 0L
+        var sum = 0.0
 
         rows
             .filter { it.merchant == this.merchant }
             .forEach { row ->
 
-                val dateTime = row.dateTime ?: return AnalyzeResult.DateFormatErr(row.dateTimeStr);
+                val dateTime = row.dateTime ?: return AnalyzeResult.DateFormatErr(row.dateTimeStr)
                 val type = row.type
-                val amount = row.amount ?: return AnalyzeResult.DoubleFormatErr(row.amountStr);
+                val amount = row.amount ?: return AnalyzeResult.DoubleFormatErr(row.amountStr)
                 val id = row.id
 
                 if (type == Type.PAYMENT && dateTime >= from && dateTime <= to) {
-                    count += 1;
+                    count += 1
                     sum += amount
                     txIdsInRange += id
                 } else if (type == Type.REVERSAL) {
                     if (row.related in txIdsInRange) {
-                        count -= 1;
+                        count -= 1
                         sum -= amount
                     }
                 }
