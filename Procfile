@@ -1,0 +1,1 @@
+web:  java -jar target/analyzer-1.0-SNAPSHOT-jar-with-dependencies.jar -port=8080

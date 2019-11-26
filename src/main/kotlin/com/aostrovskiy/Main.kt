@@ -21,37 +21,36 @@ data class Participant(val id: ID)
 data class Chat(val participants: List<Participant>, val room: Room)
 
 interface ChatEngine {
-    fun nextChat(participant: Participant) : Chat
+    fun nextChat(participant: Participant): Chat
 }
-
 
 
 val currentParticipant = Participant(ID("1234"))
 
-fun main(args: Array<String>) {
+fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
+
+@Suppress("unused") // Referenced in application.conf
+@kotlin.jvm.JvmOverloads
+fun Application.module(testing: Boolean = false) {
+
     val sessionManager = SessionManager()
     val engine = Engine();
 
-
-
-    val server = embeddedServer(Netty, port = 8080) {
-        install(ContentNegotiation) {
-            jackson {
-                enable(SerializationFeature.INDENT_OUTPUT)
-                dateFormat = DateFormat.getDateInstance()
-            }
-        }
-
-        routing {
-            get("/") {
-                call.respondText("Hello World!", ContentType.Text.Plain)
-            }
-            get("/next") {
-                val nextChat = engine.nextChat(currentParticipant)
-                call.respond(nextChat)
-            }
+    install(ContentNegotiation) {
+        jackson {
+            enable(SerializationFeature.INDENT_OUTPUT)
+            dateFormat = DateFormat.getDateInstance()
         }
     }
-    server.start(wait = true)
+
+    routing {
+        get("/") {
+            call.respondText("Hello World!", ContentType.Text.Plain)
+        }
+        get("/next") {
+            val nextChat = engine.nextChat(currentParticipant)
+            call.respond(nextChat)
+        }
+    }
 }
 
