@@ -12,3 +12,12 @@ fun String.toDateOrNull(): LocalDateTime? = try {
 } catch (e: Exception) {
     null
 }
+fun main() {
+    val map = hashMapOf<Int, Long>()
+    map[1] = 5
+    val l = map[1]
+    val x: Int? = l?.toInt()
+    println(l)
+    println(x)
+
+}

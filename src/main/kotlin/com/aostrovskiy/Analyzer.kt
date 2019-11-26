@@ -4,17 +4,21 @@ import de.siegmar.fastcsv.reader.CsvReader
 import de.siegmar.fastcsv.reader.CsvRow
 import java.io.IOException
 import java.lang.Exception
+import java.lang.RuntimeException
 import java.math.BigDecimal
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.time.LocalDateTime
+import java.util.stream.Collectors.groupingBy
 
 sealed class AnalyzeResult {
-    class Ok(val txNumber: Long, val txAverage: BigDecimal) : AnalyzeResult()
-    class CsvParseErr(val ex: Exception) : AnalyzeResult()
-    class DateFormatErr(val date: String) : AnalyzeResult()
-    class DoubleFormatErr(val double: String) : AnalyzeResult()
+
 }
+
+class Ok(val txNumber: Long, val txAverage: BigDecimal) : AnalyzeResult()
+class CsvParseErr(val ex: Exception) : AnalyzeResult()
+class DateFormatErr(val date: String) : AnalyzeResult()
+class DoubleFormatErr(val double: String) : AnalyzeResult()
 
 class Analyzer(
     private val cvsFile: Path,
@@ -64,16 +68,20 @@ class Analyzer(
      * first
      */
     fun analyze(): AnalyzeResult {
+        val x = Result.success(1)
+            .map { it * it }
+            .mapCatching { it + it }
+            .fold({it}, { 0 })
         return try {
             val file = cvsFile.toFile()
             val csvReader = CsvReader()
             csvReader.setContainsHeader(true)
             csvReader.setErrorOnDifferentFieldCount(true)
 
-            val csv = csvReader.read(file, StandardCharsets.UTF_8) ?: return AnalyzeResult.Ok(0, BigDecimal.ZERO)
+            val csv = csvReader.read(file, StandardCharsets.UTF_8) ?: return Ok(0, BigDecimal.ZERO)
             doAnalyze(csv.rows)
         } catch (ex: IOException) {
-            AnalyzeResult.CsvParseErr(ex)
+            CsvParseErr(ex)
         }
     }
 
@@ -87,9 +95,9 @@ class Analyzer(
             .filter { it.merchant == this.merchant }
             .forEach { row ->
 
-                val dateTime = row.dateTime ?: return AnalyzeResult.DateFormatErr(row.dateTimeStr)
+                val dateTime = row.dateTime ?: return DateFormatErr(row.dateTimeStr)
                 val type = row.type
-                val amount = row.amount ?: return AnalyzeResult.DoubleFormatErr(row.amountStr)
+                val amount = row.amount ?: return DoubleFormatErr(row.amountStr)
                 val id = row.id
 
                 if (type == Type.PAYMENT && dateTime >= from && dateTime <= to) {
@@ -104,6 +112,7 @@ class Analyzer(
                 }
             }
 
-        return AnalyzeResult.Ok(count, sum / BigDecimal(count))
+        return Ok(count, sum / BigDecimal(count))
     }
 }
+

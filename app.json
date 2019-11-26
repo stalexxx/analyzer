@@ -1,0 +1,6 @@
+{
+  "name": "le tok app",
+  "description": "le tok app server",
+  "image": "heroku/java",
+  "addons": [  ]
+}

@@ -13,8 +13,8 @@ class AnalyzerTest {
         val analyzer = Analyzer("test_empty.csv".toPathFromResource(), LocalDateTime.MIN, LocalDateTime.MAX, "")
         val result = analyzer.analyze()
 
-        assert(result is AnalyzeResult.Ok)
-        result as AnalyzeResult.Ok
+        assert(result is Ok)
+        result as Ok
         assertEquals(result.txNumber, 0)
         assertEquals(result.txAverage, BigDecimal.ZERO)
     }
@@ -24,8 +24,8 @@ class AnalyzerTest {
         val analyzer = Analyzer("test0.csv".toPathFromResource(), LocalDateTime.MIN, LocalDateTime.MAX, "")
         val result = analyzer.analyze()
 
-        assert(result is AnalyzeResult.Ok)
-        result as AnalyzeResult.Ok
+        assert(result is Ok)
+        result as Ok
         assertEquals(result.txNumber, 0)
         assertEquals(result.txAverage, BigDecimal.ZERO)
     }
@@ -35,7 +35,7 @@ class AnalyzerTest {
         val analyzer = Analyzer("test_wrong_csv.csv".toPathFromResource(), LocalDateTime.MIN, LocalDateTime.MAX, "")
         val result = analyzer.analyze()
 
-        assert(result is AnalyzeResult.CsvParseErr)
+        assert(result is CsvParseErr)
     }
 
     @Test
@@ -47,8 +47,8 @@ class AnalyzerTest {
 
         val result = analyzer.analyze()
 
-        assert(result is AnalyzeResult.Ok)
-        result as AnalyzeResult.Ok
+        assert(result is Ok)
+        result as Ok
         assertEquals(1, result.txNumber)
         assertEquals(result.txAverage, BigDecimal(BigInteger.valueOf(5999), 2))
     }
